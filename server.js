@@ -6,6 +6,7 @@ const path = require("path");
 const { v4: uuidv4 } = require("uuid");
 const { loadEnvFile } = require("node:process");
 const sqlite3 = require("sqlite3").verbose();
+const pdfParse = require("pdf-parse");
 
 loadEnvFile("./.env");
 
@@ -15,7 +16,7 @@ const port = 3000;
 app.use(express.json());
 
 // === Google OAuth setup ===
-const CLIENT_ID = process.env.ID;
+const CLIENT_ID = process.env.REACT_APP_GOOGLE_CLIENT_ID;
 const CLIENT_SECRET = process.env.SECRET;
 const REDIRECT_URI = "http://localhost:3000/auth/callback";
 
@@ -28,6 +29,8 @@ const oauth2Client = new google.auth.OAuth2(
 // Scopes for Google Calendar
 const scopes = ["https://www.googleapis.com/auth/calendar.readonly"];
 
+const timesFilePath = "./available_times.json";
+const coursesFilePath = "./courses_contents.json";
 // === SQLite3 (callback API) setup ===
 const db = new sqlite3.Database(path.join(__dirname, "users.db"));
 
@@ -44,9 +47,9 @@ db.serialize(() => {
     );
 });
 
-function writeTokensFile(obj) {
+function writeTokensFile(JSON_PATH, obj) {
     try {
-        fs.writeFileSync(TOKENS_PATH, JSON.stringify(obj, null, 2));
+        fs.writeFileSync(JSON_PATH, JSON.stringify(obj, null, 2));
     } catch (e) {
         console.error("Failed to write tokens file:", e);
     }
@@ -79,11 +82,20 @@ app.post("/auth", async (req, res) => {
 
     try {
         const { tokens } = await oauth2Client.getToken(code);
-        const store = readTokensFile();
+        const store = readTokensFile(TOKENS_PATH);
         store[userId] = tokens; // { "<uuid>": { google tokens } }
-        writeTokensFile(store);
+        writeTokensFile(TOKENS_PATH, store);
 
         oauth2Client.setCredentials(tokens);
+        const [startDate, events, finalDate] = await getWeeklyEvents(
+            oauth2Client
+        );
+
+        let freeTimes = await getFreeTimeFrames(startDate, events, finalDate);
+        const times = readTokensFile(timesFilePath);
+        times[userId] = freeTimes;
+        writeTokensFile(timesFilePath, times);
+
         return res.json({
             ok: true,
             userId,
@@ -113,8 +125,12 @@ app.get("/auth/callback", async (req, res) => {
         );
 
         let freeTimes = await getFreeTimeFrames(startDate, events, finalDate);
-        let scheduled;
-        [scheduled, freeTimes] = scheduleAndReserve(freeTimes, 10, 5);
+        const times = readTokensFile(timesFilePath);
+        times[userId] = freeTimes;
+        writeTokensFile(timesFilePath, times);
+
+        // let scheduled;
+        // [scheduled, freeTimes] = scheduleAndReserve(freeTimes, 10, 5);
         const list = events
             .map((e) => `<li>${e.summary || "(no title)"} — ${e.start}</li>`)
             .join("");
@@ -198,14 +214,12 @@ app.post("/test", async (req, res) => {
             .status(400)
             .json({ error: "Missing required field: userId" });
 
-    const store = readTokensFile();
+    const store = readTokensFile(TOKENS_PATH);
     const tokens = store[userId];
     if (!tokens)
-        return res
-            .status(404)
-            .json({
-                error: "No tokens stored for this userId. POST /auth first.",
-            });
+        return res.status(404).json({
+            error: "No tokens stored for this userId. POST /auth first.",
+        });
 
     try {
         oauth2Client.setCredentials(tokens);
@@ -217,6 +231,64 @@ app.post("/test", async (req, res) => {
     } catch (err) {
         console.error("Error fetching events:", err?.response?.data || err);
         return res.status(500).json({ error: "Failed to fetch events" });
+    }
+});
+
+/**
+ * POST /schedule
+ * Body: {
+ *   "userId": "string",
+ *   "pdf": "<base64 pdf data>",
+ *   "schedule": "<base64 schedule data>"
+ * }
+ */
+app.post("/schedule", async (req, res) => {
+    try {
+        //userinput is if the user has additional comments
+        const { userId, userInput, pdf, schedule } = req.body;
+
+        if (!userId) {
+            return res
+                .status(400)
+                .json({ error: "Missing userId, pdf, or schedule" });
+        }
+        //all times for users
+        const times = readTokensFile(timesFilePath);
+
+        //schedule times for messages, updatedfreetimes and schedule times returned 
+        let [scheduled, updatedFreeTimes] = scheduleAndReserve(times[userId], 10, 2);
+        times[userId] = updatedFreeTimes;
+        writeTokensFile(timesFilePath, times);
+
+        // Generate a new course ID
+        const courseId = uuidv4();
+
+        // Convert Base64 to Buffer
+        const pdfBuffer = Buffer.from(pdf, "base64");
+
+        // Extract text from PDF
+        const pdfData = await pdfParse(pdfBuffer);
+        const extractedText = pdfData.text.trim();
+
+        const scheduleBuffer = Buffer.from(schedule, "base64");
+
+
+
+        //write to the courses file with the new course content
+        const courses = readTokensFile(coursesFilePath);
+        courses[courseId] = extractedText;
+        writeTokensFile(coursesFilePath, courses);
+
+        res.json({
+            userId,
+            courseId,
+        });
+    } catch (error) {
+        console.error("Error in /schedule:", error);
+        res.status(500).json({
+            error: "Failed to process schedule",
+            details: error.message,
+        });
     }
 });
 
@@ -400,7 +472,6 @@ function scheduleAndReserve(freeTimes, numEvents, minutesPerEvent = 5) {
     return [scheduled, updatedFreeTimes];
 }
 
-
 // Promise helpers for sqlite3
 function dbGet(sql, params = []) {
     return new Promise((resolve, reject) => {
@@ -420,10 +491,10 @@ function dbRun(sql, params = []) {
 // === tiny helpers ===
 const TOKENS_PATH = path.join(__dirname, "user_tokens.json");
 
-function readTokensFile() {
+function readTokensFile(JSON_PATH) {
     try {
-        if (!fs.existsSync(TOKENS_PATH)) return {};
-        const raw = fs.readFileSync(TOKENS_PATH, "utf-8");
+        if (!fs.existsSync(JSON_PATH)) return {};
+        const raw = fs.readFileSync(JSON_PATH, "utf-8");
         return raw ? JSON.parse(raw) : {};
     } catch (e) {
         console.error("Failed to read tokens file:", e);
