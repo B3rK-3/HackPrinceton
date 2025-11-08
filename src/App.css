@@ -1,0 +1,49 @@
+.App {
+  min-height: 100vh;
+  background-color: #F5F5DC;
+}
+
+/* Brand Colors */
+:root {
+  --beige: #F5F5DC;
+  --navy-blue: #1a1a4a;
+  --navy-blue-light: #2a2a5a;
+}
+
+button {
+  background-color: rgba(26, 26, 74, 0.8);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  color: white;
+  border: 1px solid rgba(26, 26, 74, 0.3);
+  padding: 12px 24px;
+  font-size: 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(26, 26, 74, 0.2);
+}
+
+button:hover {
+  background-color: rgba(26, 26, 74, 0.9);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(26, 26, 74, 0.4);
+  border-color: rgba(26, 26, 74, 0.5);
+}
+
+button:active {
+  transform: translateY(0);
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+button:disabled:hover {
+  transform: none;
+  box-shadow: 0 2px 8px rgba(26, 26, 74, 0.2);
+}
+

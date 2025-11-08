@@ -1,0 +1,245 @@
+.upload-screen {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: #F5F5DC;
+  position: relative;
+  overflow: hidden;
+}
+
+.upload-container {
+  max-width: 700px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 40px 20px;
+  z-index: 2;
+  position: relative;
+}
+
+.upload-title-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.upload-title {
+  font-size: 36px;
+  color: #1a1a4a;
+  margin-bottom: 15px;
+  text-align: center;
+  font-weight: 700;
+}
+
+.upload-elephant-group {
+  display: flex;
+  align-items: flex-start;
+  gap: 15px;
+  margin-top: 10px;
+}
+
+.upload-elephant {
+  width: 70px;
+  height: auto;
+  flex-shrink: 0;
+}
+
+/* Decorative blue circles with gradient */
+.circle {
+  position: absolute;
+  border-radius: 50%;
+  z-index: 0;
+  background: linear-gradient(135deg, rgba(58, 58, 120, 0.4) 0%, rgba(58, 58, 120, 0.2) 50%, rgba(245, 245, 220, 0.3) 100%);
+}
+
+.circle-1 {
+  width: 400px;
+  height: 400px;
+  top: 10%;
+  left: -5%;
+  animation: float 8s ease-in-out infinite;
+}
+
+.circle-2 {
+  width: 350px;
+  height: 350px;
+  top: 55%;
+  left: -3%;
+  animation: float 10s ease-in-out infinite reverse;
+}
+
+.circle-3 {
+  width: 300px;
+  height: 300px;
+  top: 25%;
+  right: -5%;
+  animation: float 9s ease-in-out infinite;
+}
+
+.circle-4 {
+  width: 380px;
+  height: 380px;
+  bottom: -5%;
+  right: -3%;
+  animation: float 11s ease-in-out infinite reverse;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
+}
+
+.upload-description {
+  font-size: 16px;
+  color: #1a1a4a;
+  margin-bottom: 40px;
+  text-align: center;
+  line-height: 1.6;
+}
+
+.upload-section {
+  margin-bottom: 30px;
+}
+
+.section-title {
+  font-size: 20px;
+  color: #1a1a4a;
+  margin-bottom: 15px;
+  font-weight: 600;
+}
+
+.upload-area {
+  border: 3px dashed rgba(26, 26, 74, 0.4);
+  border-radius: 12px;
+  padding: 40px;
+  text-align: center;
+  background-color: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.upload-area:hover {
+  border-color: rgba(26, 26, 74, 0.6);
+  background-color: rgba(255, 255, 255, 0.85);
+}
+
+.file-input {
+  display: none;
+}
+
+.upload-label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  color: #1a1a4a;
+}
+
+.upload-icon {
+  font-size: 48px;
+}
+
+.upload-hint {
+  font-size: 14px;
+  color: #888;
+  font-style: italic;
+}
+
+.files-list {
+  margin-top: 20px;
+  text-align: left;
+}
+
+.files-count {
+  font-weight: 600;
+  color: #1a1a4a;
+  margin-bottom: 10px;
+}
+
+.file-item {
+  padding: 10px;
+  background-color: #F5F5DC;
+  border-radius: 6px;
+  margin-bottom: 8px;
+  color: #1a1a4a;
+  font-size: 14px;
+}
+
+.upload-button {
+  width: 100%;
+  padding: 16px;
+  font-size: 18px;
+  margin-top: 20px;
+}
+
+.upload-button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.upload-button:disabled:hover {
+  background-color: #ccc;
+  transform: none;
+  box-shadow: none;
+}
+
+.elephant-container {
+  position: absolute;
+  bottom: 20px;
+  left: 20px;
+  z-index: 1;
+}
+
+.elephant-image {
+  width: 120px;
+  height: auto;
+  opacity: 0.9;
+}
+
+@media (max-width: 768px) {
+  .upload-title {
+    font-size: 28px;
+  }
+  
+  .upload-area {
+    padding: 30px 20px;
+  }
+  
+  .upload-elephant {
+    width: 50px;
+  }
+  
+  .upload-elephant-group {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .circle-1 {
+    width: 250px;
+    height: 250px;
+  }
+  
+  .circle-2 {
+    width: 200px;
+    height: 200px;
+  }
+  
+  .circle-3 {
+    width: 180px;
+    height: 180px;
+  }
+  
+  .circle-4 {
+    width: 220px;
+    height: 220px;
+  }
+}
+

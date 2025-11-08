@@ -1,0 +1,141 @@
+.loading-screen {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: #F5F5DC;
+  position: relative;
+  overflow: hidden;
+}
+
+.loading-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 30px;
+  position: relative;
+  z-index: 2;
+}
+
+.spinner {
+  width: 60px;
+  height: 60px;
+  border: 6px solid #F5F5DC;
+  border-top: 6px solid #1a1a4a;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.loading-text-container {
+  min-height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.loading-text {
+  font-size: 24px;
+  color: #1a1a4a;
+  font-weight: 600;
+  animation: fadeIn 0.5s ease-in;
+  text-align: center;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Decorative blue circles with gradient */
+.circle {
+  position: absolute;
+  border-radius: 50%;
+  z-index: 0;
+  background: linear-gradient(135deg, rgba(58, 58, 120, 0.4) 0%, rgba(58, 58, 120, 0.2) 50%, rgba(245, 245, 220, 0.3) 100%);
+}
+
+.circle-1 {
+  width: 400px;
+  height: 400px;
+  top: 5%;
+  left: -5%;
+  animation: float 8s ease-in-out infinite;
+}
+
+.circle-2 {
+  width: 350px;
+  height: 350px;
+  top: 50%;
+  left: -3%;
+  animation: float 10s ease-in-out infinite reverse;
+}
+
+.circle-3 {
+  width: 300px;
+  height: 300px;
+  top: 20%;
+  right: -5%;
+  animation: float 9s ease-in-out infinite;
+}
+
+.circle-4 {
+  width: 380px;
+  height: 380px;
+  bottom: -5%;
+  right: -3%;
+  animation: float 11s ease-in-out infinite reverse;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
+}
+
+@media (max-width: 768px) {
+  .loading-text {
+    font-size: 20px;
+  }
+  
+  .spinner {
+    width: 50px;
+    height: 50px;
+    border-width: 5px;
+  }
+  
+  .circle-1 {
+    width: 250px;
+    height: 250px;
+  }
+  
+  .circle-2 {
+    width: 200px;
+    height: 200px;
+  }
+  
+  .circle-3 {
+    width: 180px;
+    height: 180px;
+  }
+  
+  .circle-4 {
+    width: 220px;
+    height: 220px;
+  }
+}
+

@@ -1,0 +1,174 @@
+.done-screen {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: #F5F5DC;
+  position: relative;
+  overflow: hidden;
+}
+
+.done-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  z-index: 2;
+}
+
+
+.checkmark {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background-color: #1a1a4a;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 60px;
+  font-weight: bold;
+  margin-bottom: 30px;
+  animation: scaleIn 0.5s ease-out;
+}
+
+@keyframes scaleIn {
+  from {
+    transform: scale(0);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.done-title {
+  font-size: 48px;
+  color: #1a1a4a;
+  margin-bottom: 15px;
+  font-weight: 700;
+  animation: fadeInUp 0.6s ease-out 0.2s both;
+}
+
+.done-message {
+  font-size: 20px;
+  color: #1a1a4a;
+  animation: fadeInUp 0.6s ease-out 0.4s both;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.elephant-container {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  z-index: 1;
+}
+
+.elephant-image {
+  width: 150px;
+  height: auto;
+  opacity: 0.9;
+}
+
+/* Decorative blue circles with gradient */
+.circle {
+  position: absolute;
+  border-radius: 50%;
+  z-index: 0;
+  background: linear-gradient(135deg, rgba(58, 58, 120, 0.4) 0%, rgba(58, 58, 120, 0.2) 50%, rgba(245, 245, 220, 0.3) 100%);
+}
+
+.circle-1 {
+  width: 400px;
+  height: 400px;
+  top: 5%;
+  left: -5%;
+  animation: float 8s ease-in-out infinite;
+}
+
+.circle-2 {
+  width: 350px;
+  height: 350px;
+  top: 50%;
+  left: -3%;
+  animation: float 10s ease-in-out infinite reverse;
+}
+
+.circle-3 {
+  width: 300px;
+  height: 300px;
+  top: 20%;
+  right: -5%;
+  animation: float 9s ease-in-out infinite;
+}
+
+.circle-4 {
+  width: 380px;
+  height: 380px;
+  bottom: -5%;
+  right: -3%;
+  animation: float 11s ease-in-out infinite reverse;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
+}
+
+@media (max-width: 768px) {
+  .done-title {
+    font-size: 36px;
+  }
+  
+  .checkmark {
+    width: 80px;
+    height: 80px;
+    font-size: 50px;
+  }
+  
+  .elephant-image {
+    width: 100px;
+  }
+  
+  .elephant-container {
+    bottom: 10px;
+    right: 10px;
+  }
+  
+  .circle-1 {
+    width: 250px;
+    height: 250px;
+  }
+  
+  .circle-2 {
+    width: 200px;
+    height: 200px;
+  }
+  
+  .circle-3 {
+    width: 180px;
+    height: 180px;
+  }
+  
+  .circle-4 {
+    width: 220px;
+    height: 220px;
+  }
+}
+
