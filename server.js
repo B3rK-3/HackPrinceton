@@ -114,6 +114,7 @@ app.post("/auth", async (req, res) => {
 
 // --- Auth: GET callback (manual testing) ---
 app.get("/auth/callback", async (req, res) => {
+    const userId = 1;
     const code = req.query.code;
     if (!code) return res.status(400).send("Missing ?code=...");
 
