@@ -9,7 +9,11 @@ export const API_ENDPOINTS = {
   REGISTER: `${API_BASE_URL}/register`,
   SIGNIN: `${API_BASE_URL}/signin`,
   AUTH: `${API_BASE_URL}/auth`,
- SCHEDULE: `${API_BASE_URL}/schedule`,
+  SCHEDULE: `${API_BASE_URL}/schedule`,
+  PROJECTS: (userId) => `${API_BASE_URL}/projects/${userId}`,
+  PROJECT: (courseId) => `${API_BASE_URL}/project/${courseId}`,
+  STUDY_PLAN: (courseId) => `${API_BASE_URL}/study-plan/${courseId}`,
+  GENERATE_STUDY_PLAN: (courseId) => `${API_BASE_URL}/study-plan/${courseId}`,
 };
 
 export { GOOGLE_CLIENT_ID };

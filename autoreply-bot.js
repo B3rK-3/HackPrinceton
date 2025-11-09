@@ -12,6 +12,7 @@ dotenv.config()
 // --- Constants ---
 const DEMO_PHONE_NUMBER = '+14047165833'
 const QUESTIONS_FILE_PATH = path.join(process.cwd(), 'questions.json')
+const COURSES_FILE_PATH = path.join(process.cwd(), 'courses_contents.json')
 
 // --- 1️⃣  Initialize Google Gemini API ---
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY
@@ -102,6 +103,20 @@ function saveQuestions(questionsData) {
     fs.writeFileSync(QUESTIONS_FILE_PATH, JSON.stringify(questionsData, null, 2))
   } catch (error) {
     console.error('⚠️ Error saving questions:', error.message)
+  }
+}
+
+// --- Load courses content from JSON file ---
+function loadCourses() {
+  try {
+    if (!fs.existsSync(COURSES_FILE_PATH)) {
+      return {}
+    }
+    const data = fs.readFileSync(COURSES_FILE_PATH, 'utf8')
+    return JSON.parse(data)
+  } catch (error) {
+    console.error('⚠️ Error loading courses:', error.message)
+    return {}
   }
 }
 
@@ -226,12 +241,25 @@ async function handleQuestionAnswer(message, pendingQuestion) {
     await sdk.send(DEMO_PHONE_NUMBER, feedbackMessage)
     console.log(`✅ Sent feedback to ${DEMO_PHONE_NUMBER}`)
     
-    // Mark question as answered
+    // Mark question as answered and track performance
     const questionsData = loadQuestions()
     if (questionsData[courseId]) {
       questionsData[courseId].answeredQuestions.push(question.id)
+      
+      // Initialize questionPerformance if it doesn't exist
+      if (!questionsData[courseId].questionPerformance) {
+        questionsData[courseId].questionPerformance = {}
+      }
+      
+      // Store performance data for this question
+      questionsData[courseId].questionPerformance[question.id] = {
+        correct: evaluation.correct,
+        answeredAt: new Date().toISOString(),
+        topic: question.topic || 'Unknown'
+      }
+      
       saveQuestions(questionsData)
-      console.log(`📊 Marked question ${question.id} as answered`)
+      console.log(`📊 Marked question ${question.id} as answered (${evaluation.correct ? 'correct' : 'incorrect'})`)
     }
   } catch (error) {
     console.error('❌ Error sending feedback:', error.message)
@@ -242,6 +270,113 @@ async function handleQuestionAnswer(message, pendingQuestion) {
 function wantsAnotherQuestion(messageText) {
   const text = messageText.toLowerCase()
   return /(another|more|next|another question|more questions|send.*question)/i.test(text)
+}
+
+// --- Check if user wants a study plan ---
+function wantsStudyPlan(messageText) {
+  const text = messageText.toLowerCase()
+  return /(study plan|create.*study plan|generate.*study plan|help me study|what should i study|i need.*study plan)/i.test(text)
+}
+
+// --- Generate study plan using Gemini API ---
+async function generateStudyPlan(courseId, questionsData, coursesData) {
+  try {
+    const course = questionsData[courseId]
+    if (!course) {
+      return "I couldn't find your course data. Please make sure you have answered some questions first."
+    }
+    
+    const courseContent = coursesData[courseId] || ""
+    const performance = course.questionPerformance || {}
+    const questions = course.questions || []
+    
+    // Analyze performance data
+    const correctQuestions = []
+    const incorrectQuestions = []
+    const topicsPerformance = {}
+    
+    for (const question of questions) {
+      const perf = performance[question.id]
+      if (perf) {
+        if (perf.correct) {
+          correctQuestions.push(question.topic || question.question.substring(0, 50))
+        } else {
+          incorrectQuestions.push(question.topic || question.question.substring(0, 50))
+          // Track topics that need work
+          const topic = perf.topic || question.topic || 'Unknown'
+          if (!topicsPerformance[topic]) {
+            topicsPerformance[topic] = { correct: 0, incorrect: 0 }
+          }
+          topicsPerformance[topic].incorrect++
+        }
+      } else {
+        // Track topics that haven't been answered yet
+        const topic = question.topic || 'Unknown'
+        if (!topicsPerformance[topic]) {
+          topicsPerformance[topic] = { correct: 0, incorrect: 0, unanswered: 0 }
+        }
+        topicsPerformance[topic].unanswered = (topicsPerformance[topic].unanswered || 0) + 1
+      }
+      
+      // Also track correct answers by topic
+      if (perf && perf.correct) {
+        const topic = perf.topic || question.topic || 'Unknown'
+        if (!topicsPerformance[topic]) {
+          topicsPerformance[topic] = { correct: 0, incorrect: 0 }
+        }
+        topicsPerformance[topic].correct++
+      }
+    }
+    
+    // Build performance summary
+    const totalAnswered = Object.keys(performance).length
+    const totalCorrect = Object.values(performance).filter(p => p.correct).length
+    const totalIncorrect = totalAnswered - totalCorrect
+    const accuracyRate = totalAnswered > 0 ? Math.round((totalCorrect / totalAnswered) * 100) : 0
+    
+    // Identify weak areas (topics with more incorrect than correct)
+    const weakTopics = Object.entries(topicsPerformance)
+      .filter(([topic, stats]) => stats.incorrect > stats.correct && stats.incorrect > 0)
+      .map(([topic]) => topic)
+    
+    // Identify topics not yet covered
+    const uncoveredTopics = Object.entries(topicsPerformance)
+      .filter(([topic, stats]) => stats.unanswered > 0)
+      .map(([topic]) => topic)
+    
+    const prompt = `You are an educational assistant creating a personalized study plan for a student.
+
+Course Content Summary (first 6000 characters):
+${courseContent.substring(0, 6000)}
+
+Student Performance Summary:
+- Total Questions Answered: ${totalAnswered}
+- Correct Answers: ${totalCorrect}
+- Incorrect Answers: ${totalIncorrect}
+- Accuracy Rate: ${accuracyRate}%
+
+Topics Needing More Practice: ${weakTopics.length > 0 ? weakTopics.join(', ') : 'None identified yet'}
+Topics Not Yet Covered: ${uncoveredTopics.length > 0 ? uncoveredTopics.join(', ') : 'None'}
+
+Create a concise, personalized study plan (aim for 500-800 words max) that includes:
+1. Brief performance summary (2-3 sentences)
+2. Top 3-5 priority areas to focus on
+3. Recommended study schedule (brief, actionable)
+4. Key topics to review (bullet points)
+5. 3-4 study strategies/tips
+
+Format as a single, well-structured message. Be concise and actionable - focus on the most important recommendations.`
+
+    console.log('🤖 Generating study plan using Gemini API...')
+    const result = await model.generateContent(prompt)
+    const response = await result.response
+    let responseText = response.text().trim()
+    
+    return responseText
+  } catch (error) {
+    console.error('❌ Error generating study plan:', error.message)
+    return "I encountered an error while generating your study plan. Please try again later."
+  }
 }
 
 // --- 1️⃣1️⃣  Send next question if available ---
@@ -345,6 +480,47 @@ async function processMessage(message) {
         }
         if (!found) {
           await sdk.send(DEMO_PHONE_NUMBER, "All questions have been answered! Upload more content to get new questions.")
+        }
+        return
+      }
+      
+      // Check if user wants a study plan
+      if (wantsStudyPlan(text)) {
+        console.log(`📚 User requested a study plan`)
+        const questionsData = loadQuestions()
+        const coursesData = loadCourses()
+        
+        // Find the most recent course (or all courses)
+        let courseFound = false
+        for (const courseId in questionsData) {
+          const course = questionsData[courseId]
+          // Only generate study plan if there's some performance data
+          if (course.questionPerformance && Object.keys(course.questionPerformance).length > 0) {
+            console.log(`📊 Generating study plan for course: ${courseId}`)
+            const studyPlan = await generateStudyPlan(courseId, questionsData, coursesData)
+            
+            // Send study plan as one complete message
+            // iMessage will handle long messages automatically
+            try {
+              await sdk.send(DEMO_PHONE_NUMBER, studyPlan)
+              console.log(`✅ Sent study plan as single message (${studyPlan.length} characters)`)
+            } catch (error) {
+              console.error('❌ Error sending study plan:', error.message)
+              // If sending fails due to length, try a shorter version
+              if (error.message && error.message.includes('length') || error.message && error.message.includes('too long')) {
+                const shortenedPlan = studyPlan.substring(0, 20000) + '\n\n[Study plan truncated due to length limits]'
+                await sdk.send(DEMO_PHONE_NUMBER, shortenedPlan)
+              } else {
+                await sdk.send(DEMO_PHONE_NUMBER, "I encountered an error sending your study plan. Please try again later.")
+              }
+            }
+            courseFound = true
+            break
+          }
+        }
+        
+        if (!courseFound) {
+          await sdk.send(DEMO_PHONE_NUMBER, "I need some performance data to generate a study plan. Please answer a few questions first, then ask for a study plan!")
         }
         return
       }

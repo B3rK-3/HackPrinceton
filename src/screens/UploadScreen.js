@@ -58,7 +58,7 @@ function UploadScreen() {
         }
 
         console.log(base64Files);
-        fetch(API_ENDPOINTS['SCHEDULE'], {
+        const response = await fetch(API_ENDPOINTS['SCHEDULE'], {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -70,7 +70,19 @@ function UploadScreen() {
             }),
         });
 
-        navigate("/loading");
+        if (response.ok) {
+            const data = await response.json();
+            console.log('Project created:', data);
+            // Navigate to loading screen, then to projects
+            navigate("/loading");
+            // After a delay, navigate to projects to see the new project
+            setTimeout(() => {
+                navigate("/projects");
+            }, 3000);
+        } else {
+            console.error('Failed to upload project');
+            alert('Failed to upload project. Please try again.');
+        }
     };
 
     const handleDragOver = (e) => {

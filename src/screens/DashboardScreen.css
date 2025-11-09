@@ -189,6 +189,219 @@
   }
 }
 
+.study-plan-section {
+  margin-top: 30px;
+}
+
+.study-plan-card {
+  background-color: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(26, 26, 74, 0.1);
+  border: 1px solid rgba(26, 26, 74, 0.1);
+}
+
+.study-plan-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.study-plan-title {
+  font-size: 24px;
+  color: #1a1a4a;
+  margin: 0;
+  font-weight: 600;
+}
+
+.generate-study-plan-btn {
+  padding: 10px 20px;
+  font-size: 14px;
+  background-color: #1a1a4a;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.generate-study-plan-btn:hover:not(:disabled) {
+  background-color: #2a2a5a;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(26, 26, 74, 0.3);
+}
+
+.generate-study-plan-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.study-plan-content {
+  margin-top: 20px;
+}
+
+.study-plan-text {
+  font-size: 16px;
+  line-height: 1.8;
+  color: #1a1a4a;
+  word-wrap: break-word;
+}
+
+.study-plan-text p {
+  margin-bottom: 12px;
+  line-height: 1.8;
+}
+
+.study-plan-text h1 {
+  font-size: 28px;
+  color: #1a1a4a;
+  margin-top: 24px;
+  margin-bottom: 16px;
+  font-weight: 700;
+}
+
+.study-plan-text h2 {
+  font-size: 24px;
+  color: #1a1a4a;
+  margin-top: 20px;
+  margin-bottom: 12px;
+  font-weight: 600;
+}
+
+.study-plan-text h3 {
+  font-size: 20px;
+  color: #1a1a4a;
+  margin-top: 16px;
+  margin-bottom: 10px;
+  font-weight: 600;
+}
+
+.study-plan-text strong {
+  font-weight: 700;
+  color: #1a1a4a;
+}
+
+.study-plan-text em {
+  font-style: italic;
+}
+
+.study-plan-text li {
+  margin-left: 20px;
+  margin-bottom: 8px;
+  list-style-type: disc;
+}
+
+.study-plan-text ul {
+  margin-left: 20px;
+  margin-bottom: 16px;
+}
+
+.study-plan-loading,
+.study-plan-empty,
+.study-plan-error {
+  padding: 20px;
+  text-align: center;
+  color: #666;
+  font-size: 16px;
+  background-color: rgba(245, 245, 220, 0.5);
+  border-radius: 8px;
+  margin-top: 20px;
+}
+
+.study-plan-error {
+  color: #d32f2f;
+  background-color: rgba(211, 47, 47, 0.1);
+}
+
+.study-plan-empty {
+  color: #666;
+}
+
+.study-plan-timeline {
+  margin-top: 20px;
+}
+
+.timeline-section {
+  margin-bottom: 24px;
+}
+
+.timeline-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1a1a4a;
+  margin-bottom: 12px;
+}
+
+.timeline-content {
+  background-color: rgba(245, 245, 220, 0.5);
+  padding: 16px;
+  border-radius: 8px;
+  border-left: 4px solid #1a1a4a;
+}
+
+.timeline-content p {
+  margin: 0;
+  line-height: 1.6;
+  color: #1a1a4a;
+}
+
+.next-text-section {
+  margin-top: 24px;
+  padding: 20px;
+  background: linear-gradient(135deg, rgba(26, 26, 74, 0.1) 0%, rgba(26, 26, 74, 0.05) 100%);
+  border-radius: 8px;
+  border: 2px solid rgba(26, 26, 74, 0.2);
+}
+
+.next-text-message {
+  text-align: center;
+}
+
+.next-text-message p {
+  margin: 8px 0;
+  font-size: 18px;
+  color: #1a1a4a;
+}
+
+.next-text-message strong {
+  font-size: 20px;
+  color: #1a1a4a;
+}
+
+.next-text-date {
+  font-size: 14px !important;
+  color: #666 !important;
+  font-style: italic;
+}
+
+.study-plan-note {
+  margin-top: 24px;
+  padding: 16px;
+  background-color: rgba(26, 26, 74, 0.05);
+  border-radius: 8px;
+  border-left: 4px solid #1a1a4a;
+}
+
+.study-plan-note p {
+  margin: 0;
+  color: #1a1a4a;
+  line-height: 1.6;
+  font-size: 14px;
+}
+
+.timeline-empty {
+  padding: 20px;
+  text-align: center;
+  color: #666;
+  font-size: 14px;
+}
+
 @media (max-width: 768px) {
   .dashboard-title {
     font-size: 32px;
@@ -213,6 +426,39 @@
   
   .chart-container {
     height: 250px;
+  }
+  
+  .study-plan-card {
+    padding: 20px;
+  }
+  
+  .study-plan-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .study-plan-title {
+    font-size: 20px;
+  }
+  
+  .generate-study-plan-btn {
+    width: 100%;
+  }
+  
+  .study-plan-text {
+    font-size: 14px;
+  }
+  
+  .study-plan-text h1 {
+    font-size: 24px;
+  }
+  
+  .study-plan-text h2 {
+    font-size: 20px;
+  }
+  
+  .study-plan-text h3 {
+    font-size: 18px;
   }
   
   .circle-1 {
