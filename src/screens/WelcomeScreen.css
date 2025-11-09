@@ -4,7 +4,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background-color: #F5F5DC;
+  background-color: #ffe9c3;
   position: relative;
   overflow: hidden;
 }
@@ -37,9 +37,16 @@
   position: relative;
 }
 
+.welcome-elephant-group {
+  display: flex;
+  align-items: flex-start;
+  gap: 15px;
+  margin-bottom: 30px;
+}
+
 .welcome-title {
   font-size: 48px;
-  color: #676666;
+  color: #1e264f;
   margin-bottom: 20px;
   font-weight: 700;
   text-align: center;
@@ -64,9 +71,20 @@
 }
 
 .welcome-elephant {
-  width: 80px;
+  width: 200px;
   height: auto;
   flex-shrink: 0;
+  transition: opacity 0.5s ease-in-out;
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 .get-started-btn {
@@ -75,12 +93,15 @@
   border-radius: 30px;
 }
 
-/* Decorative blue circles with gradient */
+/* Decorative bubbles with more fluid movement */
 .circle {
   position: absolute;
   border-radius: 50%;
   z-index: 0;
-  background: linear-gradient(135deg, rgba(58, 58, 120, 0.4) 0%, rgba(58, 58, 120, 0.2) 50%, rgba(245, 245, 220, 0.3) 100%);
+  background: linear-gradient(135deg, rgba(30, 38, 79, 0.4) 0%, rgba(255, 233, 195, 0.6) 100%);
+  backdrop-filter: blur(40px);
+  -webkit-backdrop-filter: blur(40px);
+  box-shadow: 0 8px 32px rgba(30, 38, 79, 0.1);
 }
 
 .circle-1 {
@@ -88,7 +109,7 @@
   height: 400px;
   top: 5%;
   left: -5%;
-  animation: float 8s ease-in-out infinite;
+  animation: bubbleFloat1 12s ease-in-out infinite;
 }
 
 .circle-2 {
@@ -96,7 +117,7 @@
   height: 350px;
   top: 50%;
   left: -3%;
-  animation: float 10s ease-in-out infinite reverse;
+  animation: bubbleFloat2 14s ease-in-out infinite;
 }
 
 .circle-3 {
@@ -104,7 +125,7 @@
   height: 300px;
   top: 20%;
   right: -5%;
-  animation: float 9s ease-in-out infinite;
+  animation: bubbleFloat3 13s ease-in-out infinite;
 }
 
 .circle-4 {
@@ -112,15 +133,78 @@
   height: 380px;
   bottom: -5%;
   right: -3%;
-  animation: float 11s ease-in-out infinite reverse;
+  animation: bubbleFloat4 15s ease-in-out infinite;
 }
 
-@keyframes float {
+@keyframes bubbleFloat1 {
   0%, 100% {
-    transform: translateY(0px);
+    transform: translate(0, 0) scale(1);
+    opacity: 0.6;
+  }
+  25% {
+    transform: translate(30px, -40px) scale(1.05);
+    opacity: 0.7;
   }
   50% {
-    transform: translateY(-20px);
+    transform: translate(10px, -60px) scale(0.95);
+    opacity: 0.5;
+  }
+  75% {
+    transform: translate(-20px, -30px) scale(1.02);
+    opacity: 0.65;
+  }
+}
+
+@keyframes bubbleFloat2 {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+    opacity: 0.5;
+  }
+  33% {
+    transform: translate(-25px, -50px) scale(1.08);
+    opacity: 0.7;
+  }
+  66% {
+    transform: translate(20px, -70px) scale(0.92);
+    opacity: 0.4;
+  }
+}
+
+@keyframes bubbleFloat3 {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+    opacity: 0.6;
+  }
+  25% {
+    transform: translate(-35px, -45px) scale(1.03);
+    opacity: 0.75;
+  }
+  50% {
+    transform: translate(-15px, -65px) scale(0.97);
+    opacity: 0.55;
+  }
+  75% {
+    transform: translate(25px, -35px) scale(1.05);
+    opacity: 0.7;
+  }
+}
+
+@keyframes bubbleFloat4 {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+    opacity: 0.55;
+  }
+  30% {
+    transform: translate(40px, -55px) scale(1.1);
+    opacity: 0.8;
+  }
+  60% {
+    transform: translate(-10px, -80px) scale(0.9);
+    opacity: 0.45;
+  }
+  90% {
+    transform: translate(-30px, -40px) scale(1.04);
+    opacity: 0.65;
   }
 }
 
@@ -135,7 +219,7 @@
   }
   
   .welcome-elephant {
-    width: 60px;
+    width: 150px;
   }
   
   .welcome-elephant-group {

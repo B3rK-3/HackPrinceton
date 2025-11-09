@@ -26,8 +26,14 @@ function LoginScreen() {
             } else {
               setSuccess('Signed in with Google! Redirecting...');
             }
+            // Check if user has a phone number stored
+            const userPhoneNumber = localStorage.getItem('userPhoneNumber');
             setTimeout(() => {
-              navigate('/home');
+              if (!userPhoneNumber) {
+                navigate('/phone-number');
+              } else {
+                navigate('/home');
+              }
             }, 1000);
           },
           (errorMsg) => {
@@ -103,10 +109,19 @@ function LoginScreen() {
           setSuccess('Account already exists. Logging you in...');
         }
         
-        // Small delay to show success message, then navigate
-        setTimeout(() => {
-          navigate('/home');
-        }, 1000);
+        // Check if user has a phone number stored
+        const userPhoneNumber = localStorage.getItem('userPhoneNumber');
+        if (!userPhoneNumber) {
+          // Small delay to show success message, then navigate to phone number screen
+          setTimeout(() => {
+            navigate('/phone-number');
+          }, 1000);
+        } else {
+          // Small delay to show success message, then navigate to home
+          setTimeout(() => {
+            navigate('/home');
+          }, 1000);
+        }
       } else {
         setError('Unexpected response from server. Please try again.');
         setLoading(false);

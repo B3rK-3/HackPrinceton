@@ -2,7 +2,7 @@
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  background-color: #F5F5DC;
+  background-color: #ffe9c3;
   position: relative;
   overflow: hidden;
 }
@@ -23,33 +23,36 @@
   margin-bottom: 20px;
 }
 
+.upload-elephant-group {
+  display: flex;
+  align-items: flex-start;
+  gap: 15px;
+  margin-bottom: 30px;
+}
+
 .upload-title {
   font-size: 36px;
-  color: #1a1a4a;
+  color: #1e264f;
   margin-bottom: 15px;
   text-align: center;
   font-weight: 700;
 }
 
-.upload-elephant-group {
-  display: flex;
-  align-items: flex-start;
-  gap: 15px;
-  margin-top: 10px;
-}
-
 .upload-elephant {
-  width: 70px;
+  width: 200px;
   height: auto;
   flex-shrink: 0;
 }
 
-/* Decorative blue circles with gradient */
+/* Decorative bubbles with more fluid movement */
 .circle {
   position: absolute;
   border-radius: 50%;
   z-index: 0;
-  background: linear-gradient(135deg, rgba(58, 58, 120, 0.4) 0%, rgba(58, 58, 120, 0.2) 50%, rgba(245, 245, 220, 0.3) 100%);
+  background: linear-gradient(135deg, rgba(30, 38, 79, 0.4) 0%, rgba(255, 233, 195, 0.6) 100%);
+  backdrop-filter: blur(40px);
+  -webkit-backdrop-filter: blur(40px);
+  box-shadow: 0 8px 32px rgba(30, 38, 79, 0.1);
 }
 
 .circle-1 {
@@ -57,7 +60,7 @@
   height: 400px;
   top: 10%;
   left: -5%;
-  animation: float 8s ease-in-out infinite;
+  animation: bubbleFloat1 12s ease-in-out infinite;
 }
 
 .circle-2 {
@@ -65,7 +68,7 @@
   height: 350px;
   top: 55%;
   left: -3%;
-  animation: float 10s ease-in-out infinite reverse;
+  animation: bubbleFloat2 14s ease-in-out infinite;
 }
 
 .circle-3 {
@@ -73,7 +76,7 @@
   height: 300px;
   top: 25%;
   right: -5%;
-  animation: float 9s ease-in-out infinite;
+  animation: bubbleFloat3 13s ease-in-out infinite;
 }
 
 .circle-4 {
@@ -81,21 +84,84 @@
   height: 380px;
   bottom: -5%;
   right: -3%;
-  animation: float 11s ease-in-out infinite reverse;
+  animation: bubbleFloat4 15s ease-in-out infinite;
 }
 
-@keyframes float {
+@keyframes bubbleFloat1 {
   0%, 100% {
-    transform: translateY(0px);
+    transform: translate(0, 0) scale(1);
+    opacity: 0.6;
+  }
+  25% {
+    transform: translate(30px, -40px) scale(1.05);
+    opacity: 0.7;
   }
   50% {
-    transform: translateY(-20px);
+    transform: translate(10px, -60px) scale(0.95);
+    opacity: 0.5;
+  }
+  75% {
+    transform: translate(-20px, -30px) scale(1.02);
+    opacity: 0.65;
+  }
+}
+
+@keyframes bubbleFloat2 {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+    opacity: 0.5;
+  }
+  33% {
+    transform: translate(-25px, -50px) scale(1.08);
+    opacity: 0.7;
+  }
+  66% {
+    transform: translate(20px, -70px) scale(0.92);
+    opacity: 0.4;
+  }
+}
+
+@keyframes bubbleFloat3 {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+    opacity: 0.6;
+  }
+  25% {
+    transform: translate(-35px, -45px) scale(1.03);
+    opacity: 0.75;
+  }
+  50% {
+    transform: translate(-15px, -65px) scale(0.97);
+    opacity: 0.55;
+  }
+  75% {
+    transform: translate(25px, -35px) scale(1.05);
+    opacity: 0.7;
+  }
+}
+
+@keyframes bubbleFloat4 {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+    opacity: 0.55;
+  }
+  30% {
+    transform: translate(40px, -55px) scale(1.1);
+    opacity: 0.8;
+  }
+  60% {
+    transform: translate(-10px, -80px) scale(0.9);
+    opacity: 0.45;
+  }
+  90% {
+    transform: translate(-30px, -40px) scale(1.04);
+    opacity: 0.65;
   }
 }
 
 .upload-description {
   font-size: 16px;
-  color: #1a1a4a;
+  color: #1e264f;
   margin-bottom: 40px;
   text-align: center;
   line-height: 1.6;
@@ -107,13 +173,13 @@
 
 .section-title {
   font-size: 20px;
-  color: #1a1a4a;
+  color: #1e264f;
   margin-bottom: 15px;
   font-weight: 600;
 }
 
 .upload-area {
-  border: 3px dashed rgba(26, 26, 74, 0.4);
+  border: 3px dashed rgba(30, 38, 79, 0.4);
   border-radius: 12px;
   padding: 40px;
   text-align: center;
@@ -125,7 +191,7 @@
 }
 
 .upload-area:hover {
-  border-color: rgba(26, 26, 74, 0.6);
+  border-color: rgba(30, 38, 79, 0.6);
   background-color: rgba(255, 255, 255, 0.85);
 }
 
@@ -139,7 +205,7 @@
   align-items: center;
   gap: 10px;
   cursor: pointer;
-  color: #1a1a4a;
+  color: #1e264f;
 }
 
 .upload-icon {
@@ -159,16 +225,16 @@
 
 .files-count {
   font-weight: 600;
-  color: #1a1a4a;
+  color: #1e264f;
   margin-bottom: 10px;
 }
 
 .file-item {
   padding: 10px;
-  background-color: #F5F5DC;
+  background-color: #ffe9c3;
   border-radius: 6px;
   margin-bottom: 8px;
-  color: #1a1a4a;
+  color: #1e264f;
   font-size: 14px;
 }
 
@@ -191,6 +257,78 @@
   box-shadow: none;
 }
 
+.input-group {
+  margin-bottom: 20px;
+}
+
+.input-label {
+  display: block;
+  font-size: 16px;
+  color: #1e264f;
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+
+.text-input {
+  width: 100%;
+  padding: 12px;
+  font-size: 16px;
+  border: 2px solid rgba(30, 38, 79, 0.3);
+  border-radius: 8px;
+  background-color: rgba(255, 255, 255, 0.9);
+  color: #1e264f;
+  transition: all 0.3s ease;
+  box-sizing: border-box;
+}
+
+.text-input:focus {
+  outline: none;
+  border-color: #1e264f;
+  background-color: rgba(255, 255, 255, 1);
+  box-shadow: 0 0 0 3px rgba(30, 38, 79, 0.1);
+}
+
+.text-input::placeholder {
+  color: #888;
+}
+
+.knowledge-level-display {
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.knowledge-bar {
+  flex: 1;
+  height: 24px;
+  background-color: rgba(30, 38, 79, 0.1);
+  border-radius: 12px;
+  overflow: hidden;
+  position: relative;
+}
+
+.knowledge-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #1e264f 0%, #1e264f 100%);
+  border-radius: 12px;
+  transition: width 0.3s ease;
+}
+
+.knowledge-percentage {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1e264f;
+  min-width: 45px;
+}
+
+.upload-warning {
+  color: #d32f2f;
+  font-size: 14px;
+  text-align: center;
+  margin-top: 10px;
+}
+
 .elephant-container {
   position: absolute;
   bottom: 20px;
@@ -199,7 +337,7 @@
 }
 
 .elephant-image {
-  width: 120px;
+  width: 200px;
   height: auto;
   opacity: 0.9;
 }
@@ -214,7 +352,7 @@
   }
   
   .upload-elephant {
-    width: 50px;
+    width: 150px;
   }
   
   .upload-elephant-group {

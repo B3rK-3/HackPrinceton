@@ -131,12 +131,15 @@ async function checkAndSendQuestions() {
     if (course.readyToSend && course.currentQuestionIndex === 0 && course.questions.length > 0) {
       const question = course.questions[0]
       
+      // Use phone number from course data, or fall back to DEMO_PHONE_NUMBER
+      const phoneNumber = course.phoneNumber || DEMO_PHONE_NUMBER
+      
       // Send introduction message with first question
       const message = `Hello! Here are your questions:\n\n${question.question}`
       
       try {
-        await sdk.send(DEMO_PHONE_NUMBER, message)
-        console.log(`✅ Sent first question to ${DEMO_PHONE_NUMBER}`)
+        await sdk.send(phoneNumber, message)
+        console.log(`✅ Sent first question to ${phoneNumber}`)
         console.log(`   Question: ${question.question.substring(0, 50)}...`)
         
         // Mark that first question was sent (by incrementing index)
@@ -225,6 +228,9 @@ async function handleQuestionAnswer(message, pendingQuestion) {
   console.log(`📝 User answered question: ${question.id}`)
   console.log(`   Answer: ${message.text.substring(0, 100)}...`)
   
+  // Use phone number from course data, or fall back to sender
+  const phoneNumber = course.phoneNumber || message.sender
+  
   // Evaluate the answer
   const evaluation = await evaluateAnswer(
     message.text,
@@ -238,8 +244,8 @@ async function handleQuestionAnswer(message, pendingQuestion) {
     : `❌ Not quite. ${evaluation.feedback}`
   
   try {
-    await sdk.send(DEMO_PHONE_NUMBER, feedbackMessage)
-    console.log(`✅ Sent feedback to ${DEMO_PHONE_NUMBER}`)
+    await sdk.send(phoneNumber, feedbackMessage)
+    console.log(`✅ Sent feedback to ${phoneNumber}`)
     
     // Mark question as answered and track performance
     const questionsData = loadQuestions()
@@ -389,6 +395,9 @@ async function sendNextQuestion(courseId) {
     return
   }
   
+  // Use phone number from course data, or fall back to DEMO_PHONE_NUMBER
+  const phoneNumber = course.phoneNumber || DEMO_PHONE_NUMBER
+  
   if (course.currentQuestionIndex < course.questions.length) {
     const nextQuestion = course.questions[course.currentQuestionIndex]
     
@@ -401,14 +410,14 @@ async function sendNextQuestion(courseId) {
       
       if (course.currentQuestionIndex >= course.questions.length) {
         // All questions answered
-        await sdk.send(DEMO_PHONE_NUMBER, "🎉 Great job! You've answered all the questions. Keep up the studying!")
+        await sdk.send(phoneNumber, "🎉 Great job! You've answered all the questions. Keep up the studying!")
         return
       }
       return sendNextQuestion(courseId) // Recursively find next unanswered question
     }
     
     try {
-      await sdk.send(DEMO_PHONE_NUMBER, nextQuestion.question)
+      await sdk.send(phoneNumber, nextQuestion.question)
       console.log(`✅ Sent next question (${course.currentQuestionIndex + 1}/${course.questions.length})`)
       console.log(`   Question: ${nextQuestion.question.substring(0, 50)}...`)
       
@@ -420,7 +429,7 @@ async function sendNextQuestion(courseId) {
     }
   } else {
     // All questions sent
-    await sdk.send(DEMO_PHONE_NUMBER, "🎉 Great job! You've completed all questions. Keep studying!")
+    await sdk.send(phoneNumber, "🎉 Great job! You've completed all questions. Keep studying!")
   }
 }
 
@@ -472,14 +481,21 @@ async function processMessage(message) {
         let found = false
         for (const courseId in questionsData) {
           const course = questionsData[courseId]
-          if (course.currentQuestionIndex < course.questions.length) {
+          // Check if this course matches the sender's phone number
+          const senderNormalized = message.sender.replace(/\D/g, '')
+          const coursePhoneNormalized = (course.phoneNumber || DEMO_PHONE_NUMBER).replace(/\D/g, '')
+          const matchesPhone = senderNormalized === coursePhoneNormalized || 
+                               message.sender.includes(coursePhoneNormalized.substring(coursePhoneNormalized.length - 10))
+          
+          if (matchesPhone && course.currentQuestionIndex < course.questions.length) {
             await sendNextQuestion(courseId)
             found = true
             break
           }
         }
         if (!found) {
-          await sdk.send(DEMO_PHONE_NUMBER, "All questions have been answered! Upload more content to get new questions.")
+          // Use the sender's phone number for the response
+          await sdk.send(message.sender, "All questions have been answered! Upload more content to get new questions.")
         }
         return
       }
@@ -490,28 +506,38 @@ async function processMessage(message) {
         const questionsData = loadQuestions()
         const coursesData = loadCourses()
         
-        // Find the most recent course (or all courses)
+        // Find the most recent course that matches the sender's phone number
         let courseFound = false
+        const senderNormalized = message.sender.replace(/\D/g, '')
+        
         for (const courseId in questionsData) {
           const course = questionsData[courseId]
-          // Only generate study plan if there's some performance data
-          if (course.questionPerformance && Object.keys(course.questionPerformance).length > 0) {
+          // Check if this course matches the sender's phone number
+          const coursePhoneNormalized = (course.phoneNumber || DEMO_PHONE_NUMBER).replace(/\D/g, '')
+          const matchesPhone = senderNormalized === coursePhoneNormalized || 
+                               message.sender.includes(coursePhoneNormalized.substring(coursePhoneNormalized.length - 10))
+          
+          // Only generate study plan if there's some performance data and phone matches
+          if (matchesPhone && course.questionPerformance && Object.keys(course.questionPerformance).length > 0) {
             console.log(`📊 Generating study plan for course: ${courseId}`)
             const studyPlan = await generateStudyPlan(courseId, questionsData, coursesData)
+            
+            // Use phone number from course data, or fall back to sender
+            const phoneNumber = course.phoneNumber || message.sender
             
             // Send study plan as one complete message
             // iMessage will handle long messages automatically
             try {
-              await sdk.send(DEMO_PHONE_NUMBER, studyPlan)
+              await sdk.send(phoneNumber, studyPlan)
               console.log(`✅ Sent study plan as single message (${studyPlan.length} characters)`)
             } catch (error) {
               console.error('❌ Error sending study plan:', error.message)
               // If sending fails due to length, try a shorter version
               if (error.message && error.message.includes('length') || error.message && error.message.includes('too long')) {
                 const shortenedPlan = studyPlan.substring(0, 20000) + '\n\n[Study plan truncated due to length limits]'
-                await sdk.send(DEMO_PHONE_NUMBER, shortenedPlan)
+                await sdk.send(phoneNumber, shortenedPlan)
               } else {
-                await sdk.send(DEMO_PHONE_NUMBER, "I encountered an error sending your study plan. Please try again later.")
+                await sdk.send(phoneNumber, "I encountered an error sending your study plan. Please try again later.")
               }
             }
             courseFound = true
@@ -520,7 +546,8 @@ async function processMessage(message) {
         }
         
         if (!courseFound) {
-          await sdk.send(DEMO_PHONE_NUMBER, "I need some performance data to generate a study plan. Please answer a few questions first, then ask for a study plan!")
+          // Use the sender's phone number for the response
+          await sdk.send(message.sender, "I need some performance data to generate a study plan. Please answer a few questions first, then ask for a study plan!")
         }
         return
       }

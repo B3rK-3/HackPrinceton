@@ -1,4 +1,4 @@
-.projects-screen {
+.phone-number-screen {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -7,53 +7,101 @@
   overflow: hidden;
 }
 
-.projects-content {
-  flex: 1;
-  padding: 40px 20px;
-  max-width: 1200px;
+.phone-number-container {
+  max-width: 600px;
   width: 100%;
   margin: 0 auto;
-  position: relative;
+  padding: 40px 20px;
   z-index: 2;
-}
-
-.projects-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 40px;
-  flex-wrap: wrap;
-  gap: 20px;
-}
-
-.projects-title-section {
+  position: relative;
+  flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 15px;
+  justify-content: center;
 }
 
-.projects-title {
-  font-size: 42px;
+.phone-number-title-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 40px;
+}
+
+.phone-number-title {
+  font-size: 36px;
   color: #1e264f;
+  margin-bottom: 15px;
+  text-align: center;
   font-weight: 700;
-  margin: 0;
 }
 
-.projects-elephant-group {
+.phone-number-elephant-group {
   display: flex;
   align-items: flex-start;
-  gap: 12px;
+  gap: 15px;
+  margin-top: 10px;
 }
 
-.projects-elephant {
+.phone-number-elephant {
   width: 200px;
   height: auto;
   flex-shrink: 0;
 }
 
-.create-project-btn {
-  padding: 12px 24px;
+.phone-number-form {
+  background-color: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(30, 38, 79, 0.1);
+  border: 1px solid rgba(30, 38, 79, 0.1);
+}
+
+.input-group {
+  margin-bottom: 25px;
+}
+
+.input-label {
+  display: block;
   font-size: 16px;
+  color: #1e264f;
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+
+.text-input.phone-input {
+  width: 100%;
+  padding: 14px;
+  font-size: 18px;
+  border: 2px solid rgba(30, 38, 79, 0.3);
+  border-radius: 8px;
+  background-color: rgba(255, 255, 255, 0.95);
+  color: #1e264f;
+  transition: all 0.3s ease;
+  box-sizing: border-box;
+  text-align: center;
+  letter-spacing: 1px;
+}
+
+.text-input.phone-input:focus {
+  outline: none;
+  border-color: #1e264f;
+  background-color: rgba(255, 255, 255, 1);
+  box-shadow: 0 0 0 3px rgba(30, 38, 79, 0.1);
+}
+
+.input-hint {
+  font-size: 14px;
+  color: #666;
+  margin-top: 8px;
+  text-align: center;
+}
+
+.phone-number-button {
+  width: 100%;
+  padding: 16px;
+  font-size: 18px;
   background-color: #1e264f;
   color: white;
   border: none;
@@ -61,159 +109,29 @@
   cursor: pointer;
   font-weight: 600;
   transition: all 0.3s ease;
+  margin-top: 10px;
 }
 
-.create-project-btn:hover {
+.phone-number-button:hover:not(:disabled) {
   background-color: #1e264f;
   transform: translateY(-2px);
   box-shadow: 0 4px 8px rgba(30, 38, 79, 0.3);
 }
 
-.no-projects {
-  text-align: center;
-  padding: 60px 20px;
-  background-color: rgba(255, 255, 255, 0.8);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(30, 38, 79, 0.1);
-  border: 1px solid rgba(30, 38, 79, 0.1);
+.phone-number-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
 }
 
-.no-projects p {
-  font-size: 18px;
-  color: #1e264f;
-  margin-bottom: 30px;
-}
-
-.create-first-btn {
-  padding: 14px 32px;
-  font-size: 18px;
-}
-
-.projects-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
-  gap: 30px;
-}
-
-.project-card {
-  background-color: rgba(255, 255, 255, 0.8);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  padding: 25px;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(30, 38, 79, 0.1);
-  border: 1px solid rgba(30, 38, 79, 0.1);
-  transition: all 0.3s ease;
-  display: flex;
-  flex-direction: column;
-}
-
-.project-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 6px 20px rgba(30, 38, 79, 0.2);
-  background-color: rgba(255, 255, 255, 0.95);
-}
-
-.project-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 20px;
-  flex-wrap: wrap;
-  gap: 10px;
-}
-
-.project-name {
-  font-size: 24px;
-  color: #1e264f;
-  font-weight: 700;
-  margin: 0;
-  flex: 1;
-}
-
-.project-date {
-  font-size: 14px;
-  color: #888;
-  font-weight: 500;
-}
-
-.project-files {
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-  margin-bottom: 20px;
-  flex: 1;
-}
-
-.file-item {
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
+.error-message {
   padding: 12px;
-  background-color: #ffe9c3;
+  background-color: rgba(211, 47, 47, 0.1);
+  border: 1px solid rgba(211, 47, 47, 0.3);
   border-radius: 8px;
-}
-
-.file-icon {
-  font-size: 20px;
-  flex-shrink: 0;
-}
-
-.file-info {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  flex: 1;
-}
-
-.file-label {
-  font-size: 12px;
-  color: #666;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.file-name {
+  color: #d32f2f;
+  text-align: center;
   font-size: 14px;
-  color: #1e264f;
-  word-break: break-all;
-}
-
-.project-stats {
-  display: flex !important;
-  flex-direction: row !important;
-  gap: 8px;
-  margin-bottom: 20px;
-  flex-wrap: nowrap !important;
-  align-items: center;
-  justify-content: flex-start;
-  width: 100%;
-}
-
-.stat-badge {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 6px 10px;
-  background-color: #1e264f;
-  color: white;
-  border-radius: 6px;
-  font-size: 13px;
-  font-weight: 600;
-  white-space: nowrap;
-  flex-shrink: 0;
-  flex-grow: 0;
-  min-width: max-content;
-}
-
-.view-project-btn {
-  width: 100%;
-  padding: 12px;
-  font-size: 16px;
-  margin-top: auto;
 }
 
 /* Decorative bubbles with more fluid movement */
@@ -332,21 +250,21 @@
 }
 
 @media (max-width: 768px) {
-  .projects-title {
-    font-size: 32px;
+  .phone-number-title {
+    font-size: 28px;
   }
   
-  .projects-grid {
-    grid-template-columns: 1fr;
-  }
-  
-  .projects-elephant {
+  .phone-number-elephant {
     width: 150px;
   }
   
-  .projects-elephant-group {
+  .phone-number-elephant-group {
     flex-direction: column;
-    align-items: flex-start;
+    align-items: center;
+  }
+  
+  .phone-number-form {
+    padding: 20px;
   }
   
   .circle-1 {

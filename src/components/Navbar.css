@@ -3,11 +3,11 @@
   justify-content: space-between;
   align-items: center;
   padding: 15px 30px;
-  background-color: rgba(255, 255, 255, 0.95);
+  background-color: rgba(255, 255, 255, 0.5);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  box-shadow: 0 2px 16px rgba(26, 26, 74, 0.2);
-  border-bottom: 2px solid rgba(26, 26, 74, 0.2);
+  box-shadow: 0 2px 16px rgba(30, 38, 79, 0.1);
+  border-bottom: 1px solid rgba(30, 38, 79, 0.1);
   position: sticky;
   top: 0;
   z-index: 1000;
@@ -36,36 +36,36 @@
 
 .nav-tab {
   padding: 10px 20px;
-  background-color: rgba(255, 255, 255, 0.7);
+  background-color: rgba(255, 255, 255, 0.5);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-  color: #1a1a4a;
-  border: 1px solid rgba(26, 26, 74, 0.25);
+  color: #1e264f;
+  border: 1px solid rgba(30, 38, 79, 0.25);
   border-radius: 8px;
   font-size: 16px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 1px 4px rgba(26, 26, 74, 0.1);
+  box-shadow: 0 1px 4px rgba(30, 38, 79, 0.1);
 }
 
 .nav-tab:hover {
-  background-color: rgba(255, 255, 255, 0.9);
-  border-color: rgba(26, 26, 74, 0.4);
+  background-color: rgba(255, 255, 255, 0.7);
+  border-color: rgba(30, 38, 79, 0.4);
   transform: translateY(-1px);
-  box-shadow: 0 2px 6px rgba(26, 26, 74, 0.15);
+  box-shadow: 0 2px 6px rgba(30, 38, 79, 0.15);
 }
 
 .nav-tab.active {
-  background-color: rgba(26, 26, 74, 0.8);
+  background-color: rgba(30, 38, 79, 0.8);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   color: white;
-  border-color: rgba(26, 26, 74, 0.5);
+  border-color: rgba(30, 38, 79, 0.5);
 }
 
 .nav-tab.active:hover {
-  background-color: rgba(26, 26, 74, 0.9);
+  background-color: rgba(30, 38, 79, 0.9);
 }
 
 @media (max-width: 768px) {

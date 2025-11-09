@@ -11,46 +11,71 @@ function ProjectsScreen() {
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
+
   useEffect(() => {
-    fetchProjects();
-    
-    // Refresh projects when component gains focus (e.g., when returning from upload)
+    fetchProjects(true);
+  }, []);
+
+  // Auto-refresh projects every 2 seconds
+  useEffect(() => {
+    const interval = setInterval(() => {
+      fetchProjects(false); // Don't show loading state on auto-refresh
+    }, 2000); // Refresh every 2 seconds
+
+    return () => clearInterval(interval);
+  }, []);
+
+  // Refresh projects when component gains focus
+  useEffect(() => {
     const handleFocus = () => {
-      fetchProjects();
+      fetchProjects(false); // Don't show loading state on focus refresh
     };
     window.addEventListener('focus', handleFocus);
-    
-    return () => {
-      window.removeEventListener('focus', handleFocus);
-    };
+    return () => window.removeEventListener('focus', handleFocus);
   }, []);
-  
-  const fetchProjects = async () => {
+
+  const fetchProjects = async (showLoading = true) => {
     try {
-      setLoading(true);
+      if (showLoading) {
+        setLoading(true);
+      }
+      setError(null);
       const userId = getUserId();
       
       if (!userId) {
-        setError('Please sign in to view your projects');
+        setError('User not logged in. Please log in first.');
         setLoading(false);
+        setIsInitialLoad(false);
         return;
       }
-      
+
       const response = await fetch(API_ENDPOINTS.PROJECTS(userId));
-      if (!response.ok) {
-        throw new Error('Failed to fetch projects');
-      }
       
+      if (!response.ok) {
+        throw new Error(`Failed to fetch projects: ${response.statusText}`);
+      }
+
       const data = await response.json();
-      setProjects(data.projects || []);
-      setError(null);
+      
+      if (data.projects && Array.isArray(data.projects)) {
+        setProjects(data.projects);
+      } else {
+        setProjects([]);
+      }
     } catch (err) {
       console.error('Error fetching projects:', err);
-      setError('Failed to load projects. Please try again later.');
-      setProjects([]);
+      // Only show error on initial load or if we don't have projects yet
+      if (isInitialLoad) {
+        setError(err.message || 'Failed to load projects. Please try again.');
+        setProjects([]);
+      }
+      // Silently fail on auto-refresh if we already have projects
     } finally {
-      setLoading(false);
+      if (showLoading) {
+        setLoading(false);
+        setIsInitialLoad(false);
+      }
     }
   };
 
@@ -79,11 +104,11 @@ function ProjectsScreen() {
 
         {loading ? (
           <div className="no-projects">
-            <p>Loading your projects...</p>
+            <p>Loading projects...</p>
           </div>
         ) : error ? (
           <div className="no-projects">
-            <p>{error}</p>
+            <p style={{ color: '#d32f2f', marginBottom: '20px' }}>{error}</p>
             <button 
               className="create-first-btn"
               onClick={fetchProjects}
@@ -104,19 +129,20 @@ function ProjectsScreen() {
         ) : (
           <div className="projects-grid">
             {projects.map((project) => {
-              // Format date for display
-              const createdAtDate = new Date(project.createdAt);
-              const formattedDate = createdAtDate.toLocaleDateString('en-US', {
-                year: 'numeric',
-                month: 'short',
-                day: 'numeric'
-              });
+              // Format the creation date
+              const createdDate = project.createdAt 
+                ? new Date(project.createdAt).toLocaleDateString('en-US', { 
+                    year: 'numeric', 
+                    month: 'short', 
+                    day: 'numeric' 
+                  })
+                : 'Unknown date';
               
               return (
                 <div key={project.id || project.courseId} className="project-card">
                   <div className="project-header">
-                    <h2 className="project-name">{project.name}</h2>
-                    <span className="project-date">{formattedDate}</span>
+                    <h2 className="project-name">{project.name || project.projectTitle || 'Untitled Project'}</h2>
+                    <span className="project-date">{createdDate}</span>
                   </div>
                   
                   <div className="project-files">
@@ -124,7 +150,7 @@ function ProjectsScreen() {
                       <span className="file-icon">📄</span>
                       <div className="file-info">
                         <span className="file-label">Course Material:</span>
-                        <span className="file-name">{project.courseMaterial || 'Course content loaded'}</span>
+                        <span className="file-name">{project.courseMaterial || 'Uploaded content'}</span>
                       </div>
                     </div>
                     
@@ -139,23 +165,15 @@ function ProjectsScreen() {
                   
                   <div className="project-stats">
                     <span className="stat-badge">{project.questionCount || 0} Questions</span>
-                    {project.answeredCount > 0 && (
-                      <>
-                        <span className="stat-badge" style={{ marginLeft: '8px', backgroundColor: '#4CAF50' }}>
-                          {project.answeredCount} Answered
-                        </span>
-                        <span className="stat-badge" style={{ marginLeft: '8px', backgroundColor: project.accuracyRate >= 70 ? '#4CAF50' : '#FF9800' }}>
-                          {project.accuracyRate}% Accuracy
-                        </span>
-                      </>
-                    )}
+                    <span className="stat-badge">{project.answeredCount || 0} Answered</span>
+                    <span className="stat-badge">{project.accuracyRate !== undefined ? `${project.accuracyRate}%` : '0%'} Accuracy</span>
                   </div>
                   
                   <button 
                     className="view-project-btn"
                     onClick={() => {
-                      // Store selected project in localStorage for dashboard
-                      localStorage.setItem('selectedProject', JSON.stringify(project));
+                      // Store the selected project's courseId in localStorage for DashboardScreen
+                      localStorage.setItem('selectedCourseId', project.courseId || project.id);
                       navigate('/dashboard');
                     }}
                   >

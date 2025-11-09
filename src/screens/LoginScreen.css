@@ -3,7 +3,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: #F5F5DC;
+  background-color: #ffe9c3;
   padding: 20px;
   position: relative;
   overflow: hidden;
@@ -25,19 +25,22 @@
   background-color: white;
   padding: 40px;
   border-radius: 16px;
-  box-shadow: 0 8px 24px rgba(26, 26, 74, 0.15);
+  box-shadow: 0 8px 24px rgba(30, 38, 79, 0.15);
   width: 100%;
   max-width: 400px;
   position: relative;
   z-index: 2;
 }
 
-/* Decorative blue circles with gradient */
+/* Decorative bubbles with more fluid movement */
 .circle {
   position: absolute;
   border-radius: 50%;
   z-index: 0;
-  background: linear-gradient(135deg, rgba(58, 58, 120, 0.4) 0%, rgba(58, 58, 120, 0.2) 50%, rgba(245, 245, 220, 0.3) 100%);
+  background: linear-gradient(135deg, rgba(30, 38, 79, 0.4) 0%, rgba(255, 233, 195, 0.6) 100%);
+  backdrop-filter: blur(40px);
+  -webkit-backdrop-filter: blur(40px);
+  box-shadow: 0 8px 32px rgba(30, 38, 79, 0.1);
 }
 
 .circle-1 {
@@ -45,7 +48,7 @@
   height: 400px;
   top: 5%;
   left: -5%;
-  animation: float 8s ease-in-out infinite;
+  animation: bubbleFloat1 12s ease-in-out infinite;
 }
 
 .circle-2 {
@@ -53,7 +56,7 @@
   height: 350px;
   top: 50%;
   left: -3%;
-  animation: float 10s ease-in-out infinite reverse;
+  animation: bubbleFloat2 14s ease-in-out infinite;
 }
 
 .circle-3 {
@@ -61,7 +64,7 @@
   height: 300px;
   top: 20%;
   right: -5%;
-  animation: float 9s ease-in-out infinite;
+  animation: bubbleFloat3 13s ease-in-out infinite;
 }
 
 .circle-4 {
@@ -69,21 +72,84 @@
   height: 380px;
   bottom: -5%;
   right: -3%;
-  animation: float 11s ease-in-out infinite reverse;
+  animation: bubbleFloat4 15s ease-in-out infinite;
 }
 
-@keyframes float {
+@keyframes bubbleFloat1 {
   0%, 100% {
-    transform: translateY(0px);
+    transform: translate(0, 0) scale(1);
+    opacity: 0.6;
+  }
+  25% {
+    transform: translate(30px, -40px) scale(1.05);
+    opacity: 0.7;
   }
   50% {
-    transform: translateY(-20px);
+    transform: translate(10px, -60px) scale(0.95);
+    opacity: 0.5;
+  }
+  75% {
+    transform: translate(-20px, -30px) scale(1.02);
+    opacity: 0.65;
+  }
+}
+
+@keyframes bubbleFloat2 {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+    opacity: 0.5;
+  }
+  33% {
+    transform: translate(-25px, -50px) scale(1.08);
+    opacity: 0.7;
+  }
+  66% {
+    transform: translate(20px, -70px) scale(0.92);
+    opacity: 0.4;
+  }
+}
+
+@keyframes bubbleFloat3 {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+    opacity: 0.6;
+  }
+  25% {
+    transform: translate(-35px, -45px) scale(1.03);
+    opacity: 0.75;
+  }
+  50% {
+    transform: translate(-15px, -65px) scale(0.97);
+    opacity: 0.55;
+  }
+  75% {
+    transform: translate(25px, -35px) scale(1.05);
+    opacity: 0.7;
+  }
+}
+
+@keyframes bubbleFloat4 {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+    opacity: 0.55;
+  }
+  30% {
+    transform: translate(40px, -55px) scale(1.1);
+    opacity: 0.8;
+  }
+  60% {
+    transform: translate(-10px, -80px) scale(0.9);
+    opacity: 0.45;
+  }
+  90% {
+    transform: translate(-30px, -40px) scale(1.04);
+    opacity: 0.65;
   }
 }
 
 .login-title {
   font-size: 32px;
-  color: #1a1a4a;
+  color: #1e264f;
   margin-bottom: 30px;
   text-align: center;
   font-weight: 700;
@@ -101,13 +167,13 @@
   border-radius: 8px;
   font-size: 16px;
   transition: border-color 0.3s ease;
-  background-color: #F5F5DC;
-  color: #1a1a4a;
+  background-color: #ffe9c3;
+  color: #1e264f;
 }
 
 .login-input:focus {
   outline: none;
-  border-color: #1a1a4a;
+  border-color: #1e264f;
   background-color: white;
 }
 
@@ -124,19 +190,19 @@
 .toggle-text {
   text-align: center;
   margin-top: 20px;
-  color: #1a1a4a;
+  color: #1e264f;
   font-size: 14px;
 }
 
 .toggle-link {
-  color: #1a1a4a;
+  color: #1e264f;
   cursor: pointer;
   font-weight: 600;
   text-decoration: underline;
 }
 
 .toggle-link:hover {
-  color: #2a2a5a;
+  color: #1e264f;
 }
 
 .error-message {
@@ -166,7 +232,7 @@
 }
 
 .login-button:disabled:hover {
-  background-color: #1a1a4a;
+  background-color: #1e264f;
   transform: none;
   box-shadow: none;
 }
@@ -189,7 +255,7 @@
 .divider::after {
   content: '';
   flex: 1;
-  border-bottom: 1px solid rgba(26, 26, 74, 0.2);
+  border-bottom: 1px solid rgba(30, 38, 79, 0.2);
 }
 
 .divider span {

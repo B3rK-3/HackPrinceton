@@ -430,10 +430,13 @@ Format as a single, well-structured message. Be concise and actionable - focus o
         let sentViaMessage = false;
         if (iMessageSDK) {
             try {
+                // Use phone number from course data, or fall back to DEMO_PHONE_NUMBER
+                const phoneNumber = course.phoneNumber || DEMO_PHONE_NUMBER;
+                
                 // Send study plan as one complete message
                 // iMessage will handle long messages automatically, but we'll send it as-is
-                await iMessageSDK.send(DEMO_PHONE_NUMBER, responseText);
-                console.log(`✅ Sent study plan to ${DEMO_PHONE_NUMBER} via iMessage (${responseText.length} characters)`);
+                await iMessageSDK.send(phoneNumber, responseText);
+                console.log(`✅ Sent study plan to ${phoneNumber} via iMessage (${responseText.length} characters)`);
                 sentViaMessage = true;
                 
                 // Mark as sent
@@ -447,9 +450,10 @@ Format as a single, well-structured message. Be concise and actionable - focus o
                 // Try to send a shorter version if the message is too long
                 if (error.message && (error.message.includes('length') || error.message.includes('too long') || error.message.includes('limit'))) {
                     try {
+                        const phoneNumber = course.phoneNumber || DEMO_PHONE_NUMBER;
                         const shortenedPlan = responseText.substring(0, 20000) + '\n\n[Study plan truncated due to length limits. Full plan available in dashboard.]';
-                        await iMessageSDK.send(DEMO_PHONE_NUMBER, shortenedPlan);
-                        console.log(`✅ Sent shortened study plan to ${DEMO_PHONE_NUMBER} via iMessage`);
+                        await iMessageSDK.send(phoneNumber, shortenedPlan);
+                        console.log(`✅ Sent shortened study plan to ${phoneNumber} via iMessage`);
                         sentViaMessage = true;
                         
                         course.studyPlan.sentAt = new Date().toISOString();
@@ -460,10 +464,11 @@ Format as a single, well-structured message. Be concise and actionable - focus o
                         console.error('❌ Error sending shortened study plan:', retryError.message);
                         // Send a notification that study plan is available
                         try {
-                            await iMessageSDK.send(DEMO_PHONE_NUMBER, 
+                            const phoneNumber = course.phoneNumber || DEMO_PHONE_NUMBER;
+                            await iMessageSDK.send(phoneNumber, 
                                 "📚 Your personalized study plan has been generated! Check your dashboard to view the complete plan."
                             );
-                            console.log(`✅ Sent study plan notification to ${DEMO_PHONE_NUMBER}`);
+                            console.log(`✅ Sent study plan notification to ${phoneNumber}`);
                             sentViaMessage = true;
                         } catch (notifError) {
                             console.error('❌ Error sending notification:', notifError.message);
@@ -576,9 +581,9 @@ app.get("/project/:courseId", (req, res) => {
         // Get course content
         const courseContent = coursesData[courseId] || "";
 
-        // Generate project name
-        let projectName = `Course ${courseId.substring(0, 8)}`;
-        if (courseContent.length > 0) {
+        // Generate project name (use stored title if available, otherwise extract from content)
+        let projectName = course.projectTitle || `Course ${courseId.substring(0, 8)}`;
+        if (!course.projectTitle && courseContent.length > 0) {
             const firstLines = courseContent.split('\n').slice(0, 5).join(' ');
             const titleMatch = firstLines.match(/(.{20,80})/);
             if (titleMatch) {
@@ -590,6 +595,8 @@ app.get("/project/:courseId", (req, res) => {
             id: courseId,
             courseId: courseId,
             name: projectName,
+            projectTitle: course.projectTitle || null,
+            knowledgeLevel: course.knowledgeLevel || null,
             createdAt: course.createdAt || new Date().toISOString(),
             questionCount: totalQuestions,
             answeredCount: answeredQuestions,
@@ -658,20 +665,22 @@ app.get("/projects/:userId", (req, res) => {
                 }
 
                 userProjects.push({
-                    id: courseId,
-                    courseId: courseId,
-                    name: projectName,
-                    createdAt: course.createdAt || new Date().toISOString(),
-                    questionCount: totalQuestions,
-                    answeredCount: answeredQuestions,
-                    correctCount: correctAnswers,
-                    incorrectCount: incorrectAnswers,
-                    accuracyRate: accuracyRate,
-                    courseMaterial: contentPreview,
-                    schedule: "Scheduled via iMessage", // This could be enhanced
-                    currentQuestionIndex: course.currentQuestionIndex || 0,
-                    readyToSend: course.readyToSend || false
-                });
+                id: courseId,
+                courseId: courseId,
+                name: course.projectTitle || projectName,
+                projectTitle: course.projectTitle || null,
+                knowledgeLevel: course.knowledgeLevel || null,
+                createdAt: course.createdAt || new Date().toISOString(),
+                questionCount: totalQuestions,
+                answeredCount: answeredQuestions,
+                correctCount: correctAnswers,
+                incorrectCount: incorrectAnswers,
+                accuracyRate: accuracyRate,
+                courseMaterial: contentPreview,
+                schedule: "Scheduled via iMessage", // This could be enhanced
+                currentQuestionIndex: course.currentQuestionIndex || 0,
+                readyToSend: course.readyToSend || false
+            });
             }
         }
 
@@ -698,7 +707,7 @@ app.get("/projects/:userId", (req, res) => {
  */
 app.post("/schedule", async (req, res) => {
     try {
-        const { userId, userInput, pdfs } = req.body;
+        const { userId, userInput, pdfs, projectTitle, knowledgeLevel, phoneNumber } = req.body;
         console.log("📄 Received PDF upload request for userId:", userId);
 
         // For demo purposes, generate a userId if not provided
@@ -765,6 +774,9 @@ app.post("/schedule", async (req, res) => {
         questionsData[courseId] = {
             userId: finalUserId,
             courseId,
+            projectTitle: projectTitle || null,
+            knowledgeLevel: knowledgeLevel || null,
+            phoneNumber: phoneNumber || null,
             questions: questions,
             answeredQuestions: [],
             questionPerformance: {}, // Initialize performance tracking
@@ -774,6 +786,15 @@ app.post("/schedule", async (req, res) => {
         };
         writeTokensFile(questionsFilePath, questionsData);
         console.log(`✅ Stored ${questions.length} questions in questions.json`);
+        if (projectTitle) {
+            console.log(`📝 Project title: ${projectTitle}`);
+        }
+        if (knowledgeLevel !== undefined) {
+            console.log(`📊 Knowledge level: ${knowledgeLevel}%`);
+        }
+        if (phoneNumber) {
+            console.log(`📱 Phone number: ${phoneNumber}`);
+        }
 
         res.json({
             userId: finalUserId,

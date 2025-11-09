@@ -277,26 +277,36 @@ function DashboardScreen() {
   const [studyPlan, setStudyPlan] = useState(null);
   const [studyPlanLoading, setStudyPlanLoading] = useState(false);
   const [studyPlanError, setStudyPlanError] = useState(null);
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
 
   useEffect(() => {
-    fetchProjectData();
+    fetchProjectData(true);
   }, []);
 
-  const fetchProjectData = async () => {
+  // Auto-refresh project data every 2 seconds
+  useEffect(() => {
+    const interval = setInterval(() => {
+      fetchProjectData(false); // Don't show loading state on auto-refresh
+    }, 2000); // Refresh every 2 seconds
+
+    return () => clearInterval(interval);
+  }, []);
+
+  const fetchProjectData = async (showLoading = true) => {
     try {
-      setLoading(true);
-      // Get selected project from localStorage (set when clicking View Dashboard)
-      const selectedProject = localStorage.getItem('selectedProject');
+      if (showLoading) {
+        setLoading(true);
+      }
+      // Get selected courseId from localStorage (set when clicking View Dashboard)
+      const courseId = localStorage.getItem('selectedCourseId');
       
-      if (!selectedProject) {
-        // If no project selected, try to get the first project for the user
+      if (!courseId) {
+        // If no project selected, redirect to projects page
         setError('Please select a project from the Projects page');
         setLoading(false);
+        setIsInitialLoad(false);
         return;
       }
-
-      const project = JSON.parse(selectedProject);
-      const courseId = project.courseId || project.id;
 
       const response = await fetch(API_ENDPOINTS.PROJECT(courseId));
       if (!response.ok) {
@@ -310,7 +320,8 @@ function DashboardScreen() {
       // Check if study plan is included in project data, otherwise fetch it
       if (data.studyPlan && data.studyPlan.text) {
         setStudyPlan(data.studyPlan.text);
-      } else if (data.courseId) {
+      } else if (data.courseId && isInitialLoad) {
+        // Only fetch study plan on initial load to avoid unnecessary API calls
         fetchStudyPlan(data.courseId);
       }
       
@@ -320,9 +331,15 @@ function DashboardScreen() {
       }
     } catch (err) {
       console.error('Error fetching project data:', err);
-      setError('Failed to load project data. Please try again.');
+      // Only show error on initial load or if we don't have data yet
+      if (isInitialLoad || !projectData) {
+        setError(err.message || 'Failed to load project data. Please try again.');
+      }
     } finally {
-      setLoading(false);
+      if (showLoading) {
+        setLoading(false);
+        setIsInitialLoad(false);
+      }
     }
   };
 
@@ -436,66 +453,74 @@ function DashboardScreen() {
   ];
 
   // Generate consistency data from performance timeline (if available)
-  const consistencyData = projectData && projectData.performance && Object.keys(projectData.performance).length > 0 ? (() => {
-    // Group performance by date and calculate daily accuracy
-    const performanceEntries = Object.values(projectData.performance);
-    const dateGroups = {};
+  const consistencyData = (() => {
+    // Helper function to format date as "MMM DD" (e.g., "Jan 15")
+    const formatDate = (date) => {
+      return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    };
     
-    performanceEntries.forEach((perf) => {
-      if (perf && perf.answeredAt) {
-        try {
-          const date = new Date(perf.answeredAt).toLocaleDateString();
-          if (!dateGroups[date]) {
-            dateGroups[date] = { correct: 0, total: 0 };
-          }
-          dateGroups[date].total++;
-          if (perf.correct) {
-            dateGroups[date].correct++;
-          }
-        } catch (e) {
-          console.error('Error processing performance entry:', e);
-        }
-      }
-    });
-
-    // Convert to chart data format
-    const dates = Object.keys(dateGroups).sort();
-    if (dates.length === 0) {
-      // No date data available, return empty data
-      return [
-        { name: 'Day 1', consistency: 0 },
-        { name: 'Day 2', consistency: 0 },
-        { name: 'Day 3', consistency: 0 },
-        { name: 'Day 4', consistency: 0 },
-        { name: 'Day 5', consistency: 0 },
-        { name: 'Day 6', consistency: 0 }
-      ];
+    // Helper function to get date key for grouping (YYYY-MM-DD format)
+    const getDateKey = (date) => {
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    };
+    
+    // Generate the last 6 days (today is day 6, 5 days ago is day 1)
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Normalize to start of day
+    
+    const last6Days = [];
+    for (let i = 5; i >= 0; i--) {
+      const date = new Date(today);
+      date.setDate(date.getDate() - i);
+      last6Days.push(date);
     }
     
-    // Take the last 6 days or pad with zeros if less than 6
-    const chartData = dates.slice(-6).map((date, index) => {
-      const group = dateGroups[date];
-      const accuracy = group.total > 0 ? Math.round((group.correct / group.total) * 100) : 0;
+    // Group performance by date if available
+    const dateGroups = {};
+    if (projectData && projectData.performance && Object.keys(projectData.performance).length > 0) {
+      const performanceEntries = Object.values(projectData.performance);
+      
+      performanceEntries.forEach((perf) => {
+        if (perf && perf.answeredAt) {
+          try {
+            const perfDate = new Date(perf.answeredAt);
+            perfDate.setHours(0, 0, 0, 0); // Normalize to start of day
+            const dateKey = getDateKey(perfDate);
+            
+            if (!dateGroups[dateKey]) {
+              dateGroups[dateKey] = { correct: 0, total: 0 };
+            }
+            dateGroups[dateKey].total++;
+            if (perf.correct) {
+              dateGroups[dateKey].correct++;
+            }
+          } catch (e) {
+            console.error('Error processing performance entry:', e);
+          }
+        }
+      });
+    }
+    
+    // Create chart data for the last 6 days
+    const chartData = last6Days.map((date) => {
+      const dateKey = getDateKey(date);
+      const group = dateGroups[dateKey];
+      const accuracy = group && group.total > 0 
+        ? Math.round((group.correct / group.total) * 100) 
+        : 0;
+      
       return {
-        name: `Day ${index + 1}`,
-        consistency: accuracy
+        name: formatDate(date),
+        consistency: accuracy,
+        dateKey: dateKey // Keep for reference if needed
       };
     });
     
-    // Pad with zeros if we have less than 6 data points
-    while (chartData.length < 6) {
-      chartData.unshift({ name: `Day ${chartData.length + 1}`, consistency: 0 });
-    }
-    
     return chartData;
-  })() : [
-    { name: 'Day 1', consistency: 0 },
-    { name: 'Day 2', consistency: 0 },
-    { name: 'Day 3', consistency: 0 },
-    { name: 'Day 4', consistency: 0 },
-    { name: 'Day 5', consistency: 0 },
-    { name: 'Day 6', consistency: 0 }
-  ];
+  })();
 
   if (loading) {
     return (
@@ -531,25 +556,24 @@ function DashboardScreen() {
   return (
     <div className="dashboard-screen">
       <Navbar />
-      <div className="dashboard-header">
-        <div className="dashboard-title-section">
-          <h1 className="dashboard-title">Dashboard - {projectData.name}</h1>
-          <div className="dashboard-elephant-group">
-            <img 
-              src={`/elephant${currentElephant}.png`} 
-              alt="Elephant" 
-              className="dashboard-elephant"
-              key={currentElephant}
-            />
-            <ChatBubble 
-              message={`You're doing great! Your accuracy is ${accuracyRate}%`} 
-              position="left"
-            />
+      <div className="dashboard-content">
+        <div className="dashboard-header">
+          <div className="dashboard-title-section">
+            <h1 className="dashboard-title">Dashboard - {projectData.name}</h1>
+            <div className="dashboard-elephant-group">
+              <img 
+                src={`/elephant${currentElephant}.png`} 
+                alt="Elephant" 
+                className="dashboard-elephant"
+                key={currentElephant}
+              />
+              <ChatBubble 
+                message={`You're doing great! Your accuracy is ${accuracyRate}%`} 
+                position="left"
+              />
+            </div>
           </div>
         </div>
-      </div>
-
-      <div className="dashboard-content">
         <div className="stats-grid">
           <div className="stat-card">
             <h3 className="stat-title">Questions Correct</h3>
@@ -610,6 +634,8 @@ function DashboardScreen() {
                       border: '1px solid #1a1a4a',
                       borderRadius: '8px'
                     }}
+                    labelFormatter={(label) => `${label}`}
+                    formatter={(value) => [`${value}%`, 'Accuracy']}
                   />
                   <Legend />
                   <Line 

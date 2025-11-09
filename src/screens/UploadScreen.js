@@ -10,6 +10,8 @@ function UploadScreen() {
     const navigate = useNavigate();
     const [files, setFiles] = useState([]);
     const [scheduleFile, setScheduleFile] = useState(null);
+    const [projectTitle, setProjectTitle] = useState('');
+    const [knowledgeLevel, setKnowledgeLevel] = useState('');
 
     const handleFileChange = (e) => {
         const selectedFiles = Array.from(e.target.files).filter(
@@ -58,6 +60,7 @@ function UploadScreen() {
         }
 
         console.log(base64Files);
+        const userPhoneNumber = localStorage.getItem('userPhoneNumber');
         const response = await fetch(API_ENDPOINTS['SCHEDULE'], {
             method: "POST",
             headers: {
@@ -67,6 +70,9 @@ function UploadScreen() {
                 userId: getUserId(),
                 userInput: "",
                 pdfs: base64Files,
+                projectTitle: projectTitle || undefined,
+                knowledgeLevel: knowledgeLevel ? parseInt(knowledgeLevel) : undefined,
+                phoneNumber: userPhoneNumber || undefined,
             }),
         });
 
@@ -104,7 +110,6 @@ function UploadScreen() {
             <Navbar />
             <div className="upload-container">
                 <div className="upload-title-section">
-                    <h1 className="upload-title">Upload Your Documents</h1>
                     <div className="upload-elephant-group">
                         <img
                             src="/elephant2.png"
@@ -112,16 +117,62 @@ function UploadScreen() {
                             className="upload-elephant"
                         />
                         <ChatBubble
-                            message="Upload your PDFs and I'll help you organize your learning!"
+                            message={projectTitle || knowledgeLevel 
+                                ? `Great! I'll create "${projectTitle || 'your project'}" and personalize questions based on your ${knowledgeLevel ? knowledgeLevel + '%' : 'current'} knowledge level. Upload your PDFs to get started!`
+                                : "Tell me your project title and how much you already know, then upload your PDFs and I'll create personalized questions for you!"}
                             position="left"
                         />
                     </div>
+                    <h1 className="upload-title">Upload Your Documents</h1>
                 </div>
                 <p className="upload-description">
                     Upload your course materials as PDF files. Make sure to
                     include a schedule file along with your course material to
                     schedule questions effectively.
                 </p>
+
+                <div className="upload-section">
+                    <h2 className="section-title">Project Information</h2>
+                    <div className="input-group">
+                        <label htmlFor="project-title" className="input-label">
+                            Project/Course Title
+                        </label>
+                        <input
+                            type="text"
+                            id="project-title"
+                            className="text-input"
+                            placeholder="e.g., Introduction to Psychology"
+                            value={projectTitle}
+                            onChange={(e) => setProjectTitle(e.target.value)}
+                        />
+                    </div>
+                    <div className="input-group">
+                        <label htmlFor="knowledge-level" className="input-label">
+                            How much of this content do you already know? (0-100%)
+                        </label>
+                        <input
+                            type="number"
+                            id="knowledge-level"
+                            className="text-input"
+                            placeholder="e.g., 25"
+                            min="0"
+                            max="100"
+                            value={knowledgeLevel}
+                            onChange={(e) => setKnowledgeLevel(e.target.value)}
+                        />
+                        {knowledgeLevel && (
+                            <div className="knowledge-level-display">
+                                <div className="knowledge-bar">
+                                    <div 
+                                        className="knowledge-bar-fill" 
+                                        style={{ width: `${Math.min(100, Math.max(0, parseInt(knowledgeLevel) || 0))}%` }}
+                                    ></div>
+                                </div>
+                                <span className="knowledge-percentage">{knowledgeLevel}%</span>
+                            </div>
+                        )}
+                    </div>
+                </div>
 
                 <div className="upload-section">
                     <h2 className="section-title">Course Materials (PDF)</h2>
@@ -186,10 +237,15 @@ function UploadScreen() {
                 <button
                     onClick={handleUpload}
                     className="upload-button"
-                    disabled={files.length === 0}
+                    disabled={files.length === 0 || !projectTitle.trim()}
                 >
                     Upload and Continue
                 </button>
+                {!projectTitle.trim() && (
+                    <p className="upload-warning" style={{ marginTop: '10px', color: '#d32f2f', fontSize: '14px', textAlign: 'center' }}>
+                        Please enter a project title to continue
+                    </p>
+                )}
             </div>
 
             {/* Decorative blue circles */}

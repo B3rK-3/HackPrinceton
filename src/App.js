@@ -8,6 +8,7 @@ import UploadScreen from './screens/UploadScreen';
 import LoadingScreen from './screens/LoadingScreen';
 import DoneScreen from './screens/DoneScreen';
 import DashboardScreen from './screens/DashboardScreen';
+import PhoneNumberScreen from './screens/PhoneNumberScreen';
 import './App.css';
 
 function App() {
@@ -17,6 +18,7 @@ function App() {
         <Routes>
           <Route path="/" element={<WelcomeScreen />} />
           <Route path="/login" element={<LoginScreen />} />
+          <Route path="/phone-number" element={<PhoneNumberScreen />} />
           <Route path="/home" element={<HomeScreen />} />
           <Route path="/projects" element={<ProjectsScreen />} />
           <Route path="/upload" element={<UploadScreen />} />
