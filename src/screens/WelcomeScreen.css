@@ -1,0 +1,166 @@
+.welcome-screen {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: #F5F5DC;
+  position: relative;
+  overflow: hidden;
+}
+
+.welcome-logo-top {
+  position: absolute;
+  top: 20px;
+  left: 30px;
+  z-index: 3;
+}
+
+.top-logo {
+  height: 50px;
+  width: auto;
+}
+
+.welcome-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+}
+
+.welcome-title-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 40px;
+  position: relative;
+}
+
+.welcome-title {
+  font-size: 48px;
+  color: #676666;
+  margin-bottom: 20px;
+  font-weight: 700;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+
+.remi-logo-inline {
+  height: 60px;
+  width: auto;
+  vertical-align: middle;
+}
+
+.welcome-elephant-group {
+  display: flex;
+  align-items: flex-start;
+  gap: 15px;
+  margin-top: 10px;
+}
+
+.welcome-elephant {
+  width: 80px;
+  height: auto;
+  flex-shrink: 0;
+}
+
+.get-started-btn {
+  padding: 16px 48px;
+  font-size: 20px;
+  border-radius: 30px;
+}
+
+/* Decorative blue circles with gradient */
+.circle {
+  position: absolute;
+  border-radius: 50%;
+  z-index: 0;
+  background: linear-gradient(135deg, rgba(58, 58, 120, 0.4) 0%, rgba(58, 58, 120, 0.2) 50%, rgba(245, 245, 220, 0.3) 100%);
+}
+
+.circle-1 {
+  width: 400px;
+  height: 400px;
+  top: 5%;
+  left: -5%;
+  animation: float 8s ease-in-out infinite;
+}
+
+.circle-2 {
+  width: 350px;
+  height: 350px;
+  top: 50%;
+  left: -3%;
+  animation: float 10s ease-in-out infinite reverse;
+}
+
+.circle-3 {
+  width: 300px;
+  height: 300px;
+  top: 20%;
+  right: -5%;
+  animation: float 9s ease-in-out infinite;
+}
+
+.circle-4 {
+  width: 380px;
+  height: 380px;
+  bottom: -5%;
+  right: -3%;
+  animation: float 11s ease-in-out infinite reverse;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
+}
+
+@media (max-width: 768px) {
+  .welcome-title {
+    font-size: 36px;
+    gap: 10px;
+  }
+  
+  .remi-logo-inline {
+    height: 45px;
+  }
+  
+  .welcome-elephant {
+    width: 60px;
+  }
+  
+  .welcome-elephant-group {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .circle-1 {
+    width: 250px;
+    height: 250px;
+  }
+  
+  .circle-2 {
+    width: 200px;
+    height: 200px;
+  }
+  
+  .circle-3 {
+    width: 180px;
+    height: 180px;
+  }
+  
+  .circle-4 {
+    width: 220px;
+    height: 220px;
+  }
+}
+
